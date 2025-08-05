@@ -17,13 +17,20 @@ class ReportMessage:
         self.text_change_position = ""
         self.ranks = defaultdict(list)
 
-    def get_report(self, number_order: str):
+    def get_report(self):
+        number_order = self.pd_data_repository.get_order_number_by_date(
+            date=self.today.date(),
+        )
+
+        if number_order is None:
+            return "Errro: Номера наказа не знайдено!!!"
+
         text = (
             f"Бажаю здоров'я!\n"
             f"‼№{number_order} Зміни за {self.today.strftime("%d.%m.%Y")} ‼\n"
         )
 
-        self.get_arrows_sheet(number_order)
+        self.get_arrows_sheet(str(number_order))
 
         elements = [
             self.text_enlisted_in_a_military_unit,
@@ -117,27 +124,3 @@ class ReportMessage:
         self.text_change_position += (
             f"- {full_name} {row._5} призначено на посаду{position_title}\n"
         )
-
-
-
-
-from settings import PATH_EXCEL
-
-
-d = PandasDataRepository(PATH_EXCEL)
-d.read_all_sheets(
-    target_sheets=[
-        Sheet.ARROWS.value,
-        Sheet.DECLENSION.value,
-        Sheet.LEAVE.value,
-        Sheet.BASE_2.value,
-    ]
-)
-
-r = ReportMessage(sheets=d.sheets, pd_data_repository=d)
-t = r.get_report(number_order="205")
-print(t)
-
-
-
-

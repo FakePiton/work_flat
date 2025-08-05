@@ -1,5 +1,7 @@
+from datetime import datetime
+
 import pandas as pd
-from constants import Sheet, CaseLanguage
+from constants import Sheet
 
 
 class PandasDataRepository:
@@ -21,14 +23,11 @@ class PandasDataRepository:
         else:
             return None
 
-    # def get_person_cases_by_id(
-    #     self,
-    #     person_id: int,
-    #     case_language: CaseLanguage,
-    # ) -> dict | None:
-    #     pass
+    def get_order_number_by_date(self, date: datetime.date) -> int | None:
+        declension_sheet = self.sheets[Sheet.DECLENSION.value]
+        result = declension_sheet[declension_sheet["дата"].dt.date == date]
 
-# p = PandasData(PATH_EXCEL)
-# p.read_all_sheets(target_sheets=["Arrows", "declension", "ВІДПУ"])
-#
-# print(p.sheets)
+        if not result.empty:
+            return int(result.iloc[0]["№ наказу"])
+        else:
+            return None
