@@ -1,7 +1,6 @@
 import flet as ft
 
 from services.data import PandasDataRepository
-from services.excel import ExcelData
 from services.actions import (
     NewOrder, 
     Vacation,
@@ -31,9 +30,17 @@ class Controller:
 
     @staticmethod
     def run_create_order(text_panel: ft.Text):
-        excel_data = ExcelData()
-        new_order = NewOrder(excel_data)
-        vacation = Vacation(excel_data)
+        pandas_data_repository = PandasDataRepository(PATH_EXCEL)
+        pandas_data_repository.read_all_sheets(
+            target_sheets=[
+                Sheet.ARROWS.value,
+                Sheet.DECLENSION.value,
+                Sheet.LEAVE.value,
+                Sheet.BASE_2.value,
+            ]
+        )
+        new_order = NewOrder(pandas_data_repository)
+        vacation = Vacation(pandas_data_repository)
         
         new_order.create_template()
         vacation.overdue_leave_check()

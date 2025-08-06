@@ -31,3 +31,38 @@ class PandasDataRepository:
             return int(result.iloc[0]["№ наказу"])
         else:
             return None
+
+    def get_overdue_leave(self) -> dict | None:
+        leave_sheet = self.sheets[Sheet.LEAVE.value]
+        now = datetime.now()
+
+        leave_sheet["00:00:00.1"] = pd.to_datetime(
+            leave_sheet["00:00:00.1"],
+            errors="coerce",
+        )
+
+        result = leave_sheet[
+            (leave_sheet["Unnamed: 0"].notna()) &
+            (leave_sheet["Unnamed: 22"].isna()) &
+            (leave_sheet["00:00:00.1"].dt.date <= now.date())
+        ]
+
+        if not result.empty:
+            return result
+        else:
+            return None
+
+
+from settings import PATH_EXCEL
+
+pandas_data_repository = PandasDataRepository(PATH_EXCEL)
+pandas_data_repository.read_all_sheets(
+    target_sheets=[
+        Sheet.ARROWS.value,
+        Sheet.DECLENSION.value,
+        Sheet.LEAVE.value,
+        Sheet.BASE_2.value,
+    ]
+)
+
+pandas_data_repository.get_overdue_leave()

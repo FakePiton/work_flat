@@ -1,5 +1,6 @@
 import os
 
+from services.data import PandasDataRepository
 from services.excel import ExcelData
 from docxtpl import DocxTemplate
 
@@ -14,8 +15,8 @@ from PyPDF2 import PdfMerger
 
 
 class NewOrder:
-    def __init__(self, excel_data: ExcelData):
-        self.excel_data = excel_data
+    def __init__(self, pd_data_repository: PandasDataRepository):
+        self.pd_data_repository = pd_data_repository
         self.text_info = ""
 
 
@@ -46,13 +47,11 @@ class NewOrder:
     def create_template(self):
         tpl = DocxTemplate(PATH_TEMPLATE_DOCX)
 
-        order = self.excel_data.get_order_data()
-        
         now = datetime.now()
         tomorrow = now + timedelta(days=1)
         formatted_date = self.format_ukrainian_date(tomorrow)
 
-        number = order[now.date()]
+        number = self.pd_data_repository.get_order_number_by_date(date=now.date())
         today_str = now.date().strftime("%d.%m.%Y")
 
         row = {
@@ -77,35 +76,27 @@ class NewOrder:
 
 
 class Vacation:
-    def __init__(self, excel_data: ExcelData):
-        self.excel_data = excel_data
+    def __init__(self, pd_data_repository: PandasDataRepository):
+        self.pd_data_repository = pd_data_repository
         self.text_info = ""
 
-    def print_persons(self, persons: list[dict]):
-        if not persons:
-            return None
-        
-        text = f"Військово службовці які повинні повернутися з відпустки: \n {'-' * 40} \n"
-        for person in persons:
-            for key, value in person.items():
-                text += f"{key}: {value}\n"
-            text += f"{'-' * 40}\n"
-        self.text_info += text
-
     def overdue_leave_check(self):
-        data = self.excel_data.get_vacation_data()
-        now = datetime.now()
+        leaves = self.pd_data_repository.get_overdue_leave()
 
-        person_list = []
-        for entry in data:
-            if (
-                isinstance(entry["Запланована дата прибуття"], datetime)
-                and entry["Запланована дата прибуття"].date() <= now.date() 
-                and not entry["Фактична дата прибуття"]
-            ):
-                person_list.append(entry)
+        if leaves is None:
+            return self.text_info
+        self.text_info = (
+            f"Військово службовці які повинні повернутися з відпустки: \n {'-' * 40} \n"
+        )
 
-        self.print_persons(person_list)
+        for row in leaves.itertuples(index=True):
+            self.text_info += (
+                f"ПІБ: {row[2]}\n"
+                f"Підрозділ: {row[3]}\n"
+                f"Тип відпустки: {row[4]}\n"
+                f"Запланована дата прибуття: {row[22]}\n"
+                f"{'-' * 40}\n"
+            )
 
 
 class MergePDF:
