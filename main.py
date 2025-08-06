@@ -1,6 +1,8 @@
 import flet as ft
-from constants import Action
+from constants import Action, Sheet
 from services.controller import Controller
+from services.data import PandasDataRepository
+from settings import PATH_EXCEL
 
 
 def main(page: ft.Page):
@@ -10,7 +12,7 @@ def main(page: ft.Page):
         progress_bar.visible = True
         page.update()
 
-        controller = Controller()
+        controller = Controller(pandas_data_repository=page.pandas_data_repository)
         controller.run_actions(
             name_action=drop_down.value,
             text_panel=text_panel,
@@ -29,7 +31,18 @@ def main(page: ft.Page):
     )
     drop_down = ft.Dropdown(options=[ft.DropdownOption(action.name) for action in Action], expand=True)
     submit = ft.ElevatedButton("Submit", on_click=submit_click)
-    
+
+    pandas_data_repository = PandasDataRepository()
+    pandas_data_repository.read_all_sheets(
+        file_path=PATH_EXCEL,
+        target_sheets=[
+            Sheet.ARROWS.value,
+            Sheet.DECLENSION.value,
+            Sheet.LEAVE.value,
+            Sheet.BASE_2.value,
+        ]
+    )
+    page.pandas_data_repository = pandas_data_repository
 
     page.add(
        ft.Column(

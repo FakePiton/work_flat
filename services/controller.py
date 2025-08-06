@@ -6,12 +6,14 @@ from services.actions import (
     Vacation,
     MergePDF,
 )
-from constants import Action, Sheet
+from constants import Action
 from services.report_message import ReportMessage
-from settings import PATH_EXCEL
 
 
 class Controller:
+    def __init__(self, pandas_data_repository: PandasDataRepository):
+        self.pandas_data_repository = pandas_data_repository
+
     def run_actions(self, name_action: str, text_panel: ft.Text):
         method = self.get_actions(name_action=name_action)
         if not method:
@@ -28,19 +30,9 @@ class Controller:
         }
         return dict_actions.get(name_action)
 
-    @staticmethod
-    def run_create_order(text_panel: ft.Text):
-        pandas_data_repository = PandasDataRepository(PATH_EXCEL)
-        pandas_data_repository.read_all_sheets(
-            target_sheets=[
-                Sheet.ARROWS.value,
-                Sheet.DECLENSION.value,
-                Sheet.LEAVE.value,
-                Sheet.BASE_2.value,
-            ]
-        )
-        new_order = NewOrder(pandas_data_repository)
-        vacation = Vacation(pandas_data_repository)
+    def run_create_order(self, text_panel: ft.Text):
+        new_order = NewOrder(self.pandas_data_repository)
+        vacation = Vacation(self.pandas_data_repository)
         
         new_order.create_template()
         vacation.overdue_leave_check()
@@ -54,20 +46,9 @@ class Controller:
         merge_pdf.merge_report()
         text_panel.value = merge_pdf.text_info
 
-    @staticmethod
-    def run_report_message(text_panel: ft.Text):
-        pandas_data_repository = PandasDataRepository(PATH_EXCEL)
-        pandas_data_repository.read_all_sheets(
-            target_sheets=[
-                Sheet.ARROWS.value,
-                Sheet.DECLENSION.value,
-                Sheet.LEAVE.value,
-                Sheet.BASE_2.value,
-            ]
-        )
-
+    def run_report_message(self, text_panel: ft.Text):
         report_message = ReportMessage(
-            sheets=pandas_data_repository.sheets,
-            pd_data_repository=pandas_data_repository,
+            sheets=self.pandas_data_repository.sheets,
+            pd_data_repository=self.pandas_data_repository,
         )
         text_panel.value = report_message.get_report()
