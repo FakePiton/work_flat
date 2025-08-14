@@ -73,6 +73,12 @@ def main(page: ft.Page):
             max_lines=None,
             overflow=ft.TextOverflow.CLIP,
         )
+        scrollable_text = ft.Column(
+            controls=[text_panel],
+            scroll="auto",
+            expand=True,
+            height=400,
+        )
 
         def run_service():
             progress.visible = True
@@ -98,7 +104,7 @@ def main(page: ft.Page):
                 "Запустити",
                 on_click=lambda e: threading.Thread(target=run_service).start()
             ),
-            text_panel,
+            scrollable_text,
         ])
         content.content = actions_view
         page.update()
