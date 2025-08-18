@@ -94,7 +94,7 @@ class Vacation:
                 f"ПІБ: {row[2]}\n"
                 f"Підрозділ: {row[3]}\n"
                 f"Тип відпустки: {row[4]}\n"
-                f"Запланована дата прибуття: {row[22]}\n"
+                f"Запланована дата прибуття: {row[22].strftime("%d.%m.%Y")}\n"
                 f"{'-' * 40}\n"
             )
 
@@ -116,9 +116,5 @@ class MergePDF:
         merger.write(output_path)
         merger.close()
 
-
-class WriteReportMessage:
-    def __init__(self):
-        self.text_info = ""
 
 

@@ -98,7 +98,6 @@ def main(page: ft.Page):
                 open=True
             )
             page.update()
-
         actions_view = ft.Column([
             ft.Text(f"Дії для {service_name}", size=20),
             progress,
@@ -110,8 +109,6 @@ def main(page: ft.Page):
         ])
         content.content = actions_view
         page.update()
-
-    page.snack_bar = ft.SnackBar(ft.Text("Сервіс запущено!"))
 
     show_page(1)
     after_startup(progress, page)
