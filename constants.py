@@ -11,8 +11,9 @@ class Sheet(Enum):
     DECLENSION = "declension"
     LEAVE = "ВІДПУ"
     BASE_2 = "base_2"
+    SH = "sh"
 
 
 class CaseLanguage(Enum):
-    ACCUSATIVE = "accusative"
-    DATIVE = "dative"
+    ACCUSATIVE = "accusative"  # знахідний
+    DATIVE = "dative"  # давальний

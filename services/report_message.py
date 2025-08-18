@@ -1,4 +1,4 @@
-from constants import Sheet
+from constants import Sheet, CaseLanguage
 from datetime import datetime
 import pandas as pd
 from services.data import PandasDataRepository
@@ -75,22 +75,29 @@ class ReportMessage:
             )
         ]
 
-        for row in result.itertuples(index=True):
-            methods.get(row[2])(row)
+        for row in result.iterrows():
+            methods.get(row[1].iloc[1])(row[1])
 
     def _get_enlisted_in_a_military_unit(self, row):
         if not self.text_enlisted_in_a_military_unit:
             self.text_enlisted_in_a_military_unit = (
-                "*Зараховані до списку особового складу:* \n"
+                "*Зараховано до списку особового складу:* \n"
             )
 
-        person_id,  position = row._56.split("_")
-        person = self.pd_data_repository.get_person_by_id(int(person_id))
-
-        full_name, position_title = person.iloc[103].split(",")
+        person_id,  _ = row.iloc[55].split("_")
+        (
+            rank_accusative,
+            full_name_accusative,
+            position_accusative
+        ) = self.pd_data_repository.get_rank_full_name_position_case(
+            person_id=int(person_id),
+            rank_str=row.iloc[2],
+            position_str=row.iloc[5],
+            case_language=CaseLanguage.ACCUSATIVE,
+        )
 
         self.text_enlisted_in_a_military_unit += (
-            f"- {full_name} призначено на посаду{position_title}\n"
+            f"- {rank_accusative} {full_name_accusative} призначено на посаду {position_accusative}\n"
         )
 
     def _get_prescription(self, row):
@@ -99,28 +106,55 @@ class ReportMessage:
                 "*Виведено в розпорядження командира військової частини А4862:* \n"
             )
 
-        person_id, _ = row._56.split("_")
-        person = self.pd_data_repository.get_person_by_id(int(person_id))
+        person_id, _ = row.iloc[55].split("_")
 
-        full_name= person.iloc[102]
-        self.text_prescription += f"- {full_name} {row._5}\n"
+        rank_accusative = self.pd_data_repository.get_rank_case(
+            rank_str=row.iloc[2],
+            case_language=CaseLanguage.ACCUSATIVE,
+        )
+        full_name_accusative = self.pd_data_repository.get_full_name_case(
+            person_id=int(person_id),
+            case_language=CaseLanguage.ACCUSATIVE,
+        )
+
+        self.text_prescription += f"- {rank_accusative} {full_name_accusative} {row.iloc[4]}\n"
 
     def _get_rank(self, row):
-        title = f"*Присвоєні {row._19} військові звання: {row._6}:*\n"
+        title = f"*Присвоєні {row.iloc[18]} військові звання: {row.iloc[5]}:*\n"
 
-        person_id, _ = row._57.split("_")
-        person = self.pd_data_repository.get_person_by_id(int(person_id))
-        full_name = person.iloc[109]
-        self.ranks[title].append(f"- {full_name}\n")
+        person_id, _ = row.iloc[56].split("_")
+        (
+            rank_dative,
+            full_name_dative,
+            position_dative
+        ) = self.pd_data_repository.get_rank_full_name_position_case(
+            person_id=int(person_id),
+            rank_str=row.iloc[2],
+            position_str=row.iloc[4],
+            case_language=CaseLanguage.DATIVE,
+        )
+        self.ranks[title].append(f"- {rank_dative} {full_name_dative} {position_dative} \n")
 
     def _get_change_position(self, row):
         if not self.text_change_position:
             self.text_change_position = f"*Переміщення по посадам:*\n"
 
-        person_id, position = row._56.split("_")
-        person = self.pd_data_repository.get_person_by_id(int(person_id))
+        person_id, position = row.iloc[55].split("_")
 
-        full_name, position_title = person.iloc[103].split(",")
+        rank_accusative = self.pd_data_repository.get_rank_case(
+            rank_str=row.iloc[2],
+            case_language=CaseLanguage.ACCUSATIVE,
+        )
+        full_name_accusative = self.pd_data_repository.get_full_name_case(
+            person_id=int(person_id),
+            case_language=CaseLanguage.ACCUSATIVE,
+        )
+        position_accusative = self.pd_data_repository.get_position_case(
+            position_str=row.iloc[5],
+            case_language=CaseLanguage.ACCUSATIVE,
+        )
+
         self.text_change_position += (
-            f"- {full_name} {row._5} призначено на посаду{position_title}\n"
+            f"- {rank_accusative} {full_name_accusative} "
+            f"{row.iloc[4]} призначено на посаду {position_accusative}\n"
         )

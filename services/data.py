@@ -1,6 +1,6 @@
 from datetime import datetime
 import pandas as pd
-from constants import Sheet
+from constants import Sheet, CaseLanguage
 
 
 class PandasDataRepository:
@@ -50,3 +50,54 @@ class PandasDataRepository:
             return result
         else:
             return None
+
+    def get_rank_case(
+        self,
+        rank_str: str,
+        case_language: CaseLanguage,
+    ) -> str:
+        declension_sheet = self.sheets[Sheet.DECLENSION.value]
+        result = declension_sheet[declension_sheet["Звання називний"].str.strip() == rank_str.strip()]
+
+        if case_language == CaseLanguage.ACCUSATIVE:
+            return result["✪ вибери!"].iloc[0]
+        elif case_language == CaseLanguage.DATIVE:
+            return result["Звання давальний"].iloc[0]
+
+    def get_full_name_case(
+        self,
+        person_id: int,
+        case_language: CaseLanguage,
+    ) -> str:
+        person = self.get_person_by_id(person_id)
+
+        if case_language == CaseLanguage.ACCUSATIVE:
+            return person.iloc[111]
+        elif case_language == CaseLanguage.DATIVE:
+            return person.iloc[105]
+
+    def get_position_case(
+        self,
+        position_str: str,
+        case_language: CaseLanguage,
+    ) -> str:
+        sh_sheet = self.sheets[Sheet.SH.value]
+        result = sh_sheet[sh_sheet["Повна посада"].str.strip() == position_str.strip()]
+
+        if case_language == CaseLanguage.ACCUSATIVE:
+            return result["знахідний (без в/ч)"].iloc[0]
+        elif case_language == CaseLanguage.DATIVE:
+            return result["давальний (без в/ч)"].iloc[0]
+
+
+    def get_rank_full_name_position_case(
+        self,
+        rank_str: str,
+        person_id: int,
+        position_str: str,
+        case_language: CaseLanguage,
+    ):
+        rank = self.get_rank_case(rank_str, case_language)
+        full_name = self.get_full_name_case(person_id, case_language)
+        position = self.get_position_case(position_str, case_language)
+        return rank, full_name, position
