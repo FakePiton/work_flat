@@ -14,13 +14,16 @@ class Controller:
     def __init__(self, pandas_data_repository: PandasDataRepository):
         self.pandas_data_repository = pandas_data_repository
 
-    def run_actions(self, name_action: str, text_panel: ft.Text):
+    def run_actions(self, **kwargs):
+        name_action: str = kwargs.get("name_action")
+        text_panel: ft.Text = kwargs.get("text_panel")
+
         method = self.get_actions(name_action=name_action)
         if not method:
             text_panel.value = "Дія не знайдена"
             return
         
-        method(text_panel=text_panel)
+        method(**kwargs)
 
     def get_actions(self, name_action: str):
         dict_actions = {
@@ -30,7 +33,9 @@ class Controller:
         }
         return dict_actions.get(name_action)
 
-    def run_create_order(self, text_panel: ft.Text):
+    def run_create_order(self, **kwargs):
+        text_panel: ft.Text = kwargs.get("text_panel")
+
         new_order = NewOrder(self.pandas_data_repository)
         vacation = Vacation(self.pandas_data_repository)
         
@@ -41,12 +46,16 @@ class Controller:
         text_panel.value = text
 
     @staticmethod
-    def run_merge_report(text_panel: ft.Text):
+    def run_merge_report(**kwargs):
+        text_panel: ft.Text = kwargs.get("text_panel")
+
         merge_pdf = MergePDF()
         merge_pdf.merge_report()
         text_panel.value = merge_pdf.text_info
 
-    def run_report_message(self, text_panel: ft.Text):
+    def run_report_message(self, **kwargs):
+        text_panel: ft.Text = kwargs.get("text_panel")
+
         report_message = ReportMessage(
             sheets=self.pandas_data_repository.sheets,
             pd_data_repository=self.pandas_data_repository,
