@@ -6,8 +6,9 @@ from services.actions import (
     Vacation,
     MergePDF,
 )
-from constants import Action
+from constants import Action, Sheet
 from services.report_message import ReportMessage
+from settings import PATH_EXCEL
 
 
 class Controller:
@@ -30,6 +31,7 @@ class Controller:
             Action.CREATE_TEMPLATE_ORDER.name: self.run_create_order,
             Action.MERGE_REPORT.name: self.run_merge_report,
             Action.REPORT_MESSAGE.name: self.run_report_message,
+            Action.RESET_DB.name: self.run_reset_db,
         }
         return dict_actions.get(name_action)
 
@@ -61,3 +63,22 @@ class Controller:
             pd_data_repository=self.pandas_data_repository,
         )
         text_panel.value = report_message.get_report()
+
+    @staticmethod
+    def run_reset_db(**kwargs):
+        text_panel: ft.Text = kwargs.get("text_panel")
+        page: ft.Page = kwargs.get("page")
+
+        pandas_data_repository = PandasDataRepository()
+        pandas_data_repository.read_all_sheets(
+            file_path=PATH_EXCEL,
+            target_sheets=[
+                Sheet.ARROWS.value,
+                Sheet.DECLENSION.value,
+                Sheet.LEAVE.value,
+                Sheet.BASE_2.value,
+                Sheet.SH.value,
+            ]
+        )
+        page.pandas_data_repository = pandas_data_repository
+        text_panel.value = "Обновлено успішно"

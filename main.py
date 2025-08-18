@@ -89,6 +89,7 @@ def main(page: ft.Page):
             controller.run_actions(
                 name_action=service_name,
                 text_panel=text_panel,
+                page=page,
             )
 
             progress.visible = False

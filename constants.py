@@ -4,6 +4,7 @@ class Action(Enum):
     CREATE_TEMPLATE_ORDER = "create_template_order"
     MERGE_REPORT = "merge_report"
     REPORT_MESSAGE = "report_message"
+    RESET_DB = "reset_db"
 
 
 class Sheet(Enum):
