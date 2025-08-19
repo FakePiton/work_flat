@@ -80,6 +80,12 @@ def main(page: ft.Page):
             expand=True,
             height=400,
         )
+        date_picker = ft.DatePicker()
+        button_date_picker = ft.ElevatedButton(
+            "Pick date",
+            icon=ft.Icons.CALENDAR_MONTH,
+            on_click=lambda e: page.open(date_picker),
+        )
 
         def run_service():
             progress.visible = True
@@ -90,6 +96,7 @@ def main(page: ft.Page):
                 name_action=service_name,
                 text_panel=text_panel,
                 page=page,
+                date_picker_date=date_picker.value,
             )
 
             progress.visible = False
@@ -98,7 +105,8 @@ def main(page: ft.Page):
                 open=True
             )
             page.update()
-        actions_view = ft.Column([
+
+        column_list_objects = [
             ft.Text(f"Дії для {service_name}", size=20),
             progress,
             ft.ElevatedButton(
@@ -106,7 +114,13 @@ def main(page: ft.Page):
                 on_click=lambda e: threading.Thread(target=run_service).start()
             ),
             scrollable_text,
-        ])
+        ]
+
+        if service_name == Action.REPORT_MESSAGE.name:
+            column_list_objects.insert(2, button_date_picker)
+
+        actions_view = ft.Column(column_list_objects)
+
         content.content = actions_view
         page.update()
 

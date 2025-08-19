@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import flet as ft
 
 from services.data import PandasDataRepository
@@ -57,12 +59,13 @@ class Controller:
 
     def run_report_message(self, **kwargs):
         text_panel: ft.Text = kwargs.get("text_panel")
+        date_picker_date: datetime | None = kwargs.get("date_picker_date")
 
         report_message = ReportMessage(
             sheets=self.pandas_data_repository.sheets,
             pd_data_repository=self.pandas_data_repository,
         )
-        text_panel.value = report_message.get_report()
+        text_panel.value = report_message.get_report(order_date=date_picker_date)
 
     @staticmethod
     def run_reset_db(**kwargs):

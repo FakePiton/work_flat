@@ -10,16 +10,19 @@ class ReportMessage:
         self.sheets = sheets
         self.text_info = ""
         self.pd_data_repository = pd_data_repository
-        self.today = datetime.today()
+        self.order_date = datetime.today()
 
         self.text_enlisted_in_a_military_unit = ""
         self.text_prescription = ""
         self.text_change_position = ""
         self.ranks = defaultdict(list)
 
-    def get_report(self):
+    def get_report(self, order_date: datetime | None = None):
+        if order_date:
+            self.order_date = order_date
+
         number_order = self.pd_data_repository.get_order_number_by_date(
-            date=self.today.date(),
+            date=self.order_date.date(),
         )
 
         if number_order is None:
@@ -27,7 +30,7 @@ class ReportMessage:
 
         text = (
             f"Бажаю здоров'я!\n"
-            f"‼№{number_order} Зміни за {self.today.strftime("%d.%m.%Y")} ‼\n"
+            f"‼№{number_order} Зміни за {self.order_date.strftime("%d.%m.%Y")} ‼\n"
         )
 
         self.get_arrows_sheet(str(number_order))
@@ -65,11 +68,13 @@ class ReportMessage:
             "РОЗПОРЯДЖ": self._get_prescription,
             "ПОСАДА": self._get_change_position,
             "ЗВАННЯ": self._get_rank,
+            # Звільнення
+            # Переведення
         }
 
         result = arrows[
             (arrows["Unnamed: 6"] == number_order) &
-            (arrows["Unnamed: 7"].dt.year == self.today.year) &
+            (arrows["Unnamed: 7"].dt.year == self.order_date.year) &
             (
                 arrows["ПЕРЕВ"].isin(methods.keys())
             )

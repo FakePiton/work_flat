@@ -57,6 +57,10 @@ class PandasDataRepository:
         case_language: CaseLanguage,
     ) -> str:
         declension_sheet = self.sheets[Sheet.DECLENSION.value]
+        tag_contract = " військової служби за контрактом"
+        if tag_contract in rank_str:
+            rank_str = rank_str.replace(tag_contract, "")
+
         result = declension_sheet[declension_sheet["Звання називний"].str.strip() == rank_str.strip()]
 
         if case_language == CaseLanguage.ACCUSATIVE:
