@@ -68,8 +68,6 @@ class ReportMessage:
             "РОЗПОРЯДЖ": self._get_prescription,
             "ПОСАДА": self._get_change_position,
             "ЗВАННЯ": self._get_rank,
-            # Звільнення
-            # Переведення
         }
 
         result = arrows[
