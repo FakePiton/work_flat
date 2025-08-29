@@ -19,6 +19,7 @@ def after_startup(progress_bar: ft.ProgressBar, page: ft.Page):
             Sheet.LEAVE.value,
             Sheet.BASE_2.value,
             Sheet.SH.value,
+            Sheet.HV.value,
         ]
     )
     page.pandas_data_repository = pandas_data_repository

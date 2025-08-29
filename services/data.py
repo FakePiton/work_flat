@@ -51,6 +51,27 @@ class PandasDataRepository:
         else:
             return None
 
+    def get_overdue_vlk(self):
+        hv_sheet = self.sheets[Sheet.HV.value]
+        now = datetime.now()
+
+        hv_sheet["Unnamed: 12"] = pd.to_datetime(
+            hv_sheet["Unnamed: 12"],
+            format="%d.%m.%Y",
+            errors="coerce",
+        )
+
+        result = hv_sheet[
+            (hv_sheet["Unnamed: 28"].notna()) &
+            (hv_sheet["Unnamed: 12"].dt.date <= now.date())
+        ]
+
+        if not result.empty:
+            return result
+        else:
+            return None
+
+
     def get_rank_case(
         self,
         rank_str: str,

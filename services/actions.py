@@ -98,6 +98,30 @@ class Vacation:
             )
 
 
+class VLK:
+    def __init__(self, pd_data_repository: PandasDataRepository):
+        self.pd_data_repository = pd_data_repository
+        self.text_info = ""
+
+    def report(self):
+        vlk = self.pd_data_repository.get_overdue_vlk()
+
+        if vlk is None:
+            return self.text_info
+        self.text_info = (
+            f"Військово службовці які повинні повернутися з ВЛК: \n {'-' * 40} \n"
+        )
+
+        for row in vlk.itertuples(index=True):
+            self.text_info += (
+                f"ПІБ: {row[2]}\n"
+                f"Підрозділ: {row[3]}\n"
+                f"Вид: {row[4]}\n"
+                f"Дата вибуття : {row[13].strftime("%d.%m.%Y")}\n"
+                f"{'-' * 40}\n"
+            )
+
+
 class MergePDF:
     def __init__(self):
         self.text_info = ""

@@ -4,9 +4,10 @@ import flet as ft
 
 from services.data import PandasDataRepository
 from services.actions import (
-    NewOrder, 
+    NewOrder,
     Vacation,
     MergePDF,
+    VLK,
 )
 from constants import Action, Sheet
 from services.report_message import ReportMessage
@@ -42,11 +43,20 @@ class Controller:
 
         new_order = NewOrder(self.pandas_data_repository)
         vacation = Vacation(self.pandas_data_repository)
+        vlk = VLK(self.pandas_data_repository)
         
         new_order.create_template()
         vacation.overdue_leave_check()
+        vlk.report()
 
-        text = new_order.text_info + "\n\n" + vacation.text_info
+        text = (
+            new_order.text_info +
+            "\n\n" +
+            vacation.text_info +
+            "\n\n" +
+            vlk.text_info
+        )
+
         text_panel.value = text
 
     @staticmethod

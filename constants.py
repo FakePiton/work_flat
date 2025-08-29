@@ -13,6 +13,7 @@ class Sheet(Enum):
     LEAVE = "ВІДПУ"
     BASE_2 = "base_2"
     SH = "sh"
+    HV = "ХВ"
 
 
 class CaseLanguage(Enum):
