@@ -1,8 +1,8 @@
 import threading
 import flet as ft
-from constants import Action, Sheet
+from constants import Action
 from services.controller import Controller
-from services.data import PandasDataRepository, get_pandas_data_repository
+from services.data import get_pandas_data_repository
 from settings import PATH_EXCEL, PATH_EXCEL_PDF, PATH_IRKA_DIRKA_ORDER
 
 
