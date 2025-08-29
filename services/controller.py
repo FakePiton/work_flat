@@ -2,16 +2,15 @@ from datetime import datetime
 
 import flet as ft
 
-from services.data import PandasDataRepository
+from services.data import PandasDataRepository, get_pandas_data_repository
 from services.actions import (
     NewOrder,
     Vacation,
     MergePDF,
     VLK,
 )
-from constants import Action, Sheet
+from constants import Action
 from services.report_message import ReportMessage
-from settings import PATH_EXCEL
 
 
 class Controller:
@@ -82,16 +81,5 @@ class Controller:
         text_panel: ft.Text = kwargs.get("text_panel")
         page: ft.Page = kwargs.get("page")
 
-        pandas_data_repository = PandasDataRepository()
-        pandas_data_repository.read_all_sheets(
-            file_path=PATH_EXCEL,
-            target_sheets=[
-                Sheet.ARROWS.value,
-                Sheet.DECLENSION.value,
-                Sheet.LEAVE.value,
-                Sheet.BASE_2.value,
-                Sheet.SH.value,
-            ]
-        )
-        page.pandas_data_repository = pandas_data_repository
+        page.pandas_data_repository = get_pandas_data_repository()
         text_panel.value = "Обновлено успішно"

@@ -2,7 +2,7 @@ import threading
 import flet as ft
 from constants import Action, Sheet
 from services.controller import Controller
-from services.data import PandasDataRepository
+from services.data import PandasDataRepository, get_pandas_data_repository
 from settings import PATH_EXCEL, PATH_EXCEL_PDF, PATH_IRKA_DIRKA_ORDER
 
 
@@ -10,19 +10,8 @@ def after_startup(progress_bar: ft.ProgressBar, page: ft.Page):
     progress_bar.visible = True
     page.update()
 
-    pandas_data_repository = PandasDataRepository()
-    pandas_data_repository.read_all_sheets(
-        file_path=PATH_EXCEL,
-        target_sheets=[
-            Sheet.ARROWS.value,
-            Sheet.DECLENSION.value,
-            Sheet.LEAVE.value,
-            Sheet.BASE_2.value,
-            Sheet.SH.value,
-            Sheet.HV.value,
-        ]
-    )
-    page.pandas_data_repository = pandas_data_repository
+    page.pandas_data_repository = get_pandas_data_repository()
+
     progress_bar.visible = False
     page.update()
 

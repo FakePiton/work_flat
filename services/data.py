@@ -1,6 +1,7 @@
 from datetime import datetime
 import pandas as pd
 from constants import Sheet, CaseLanguage
+from settings import PATH_EXCEL
 
 
 class PandasDataRepository:
@@ -126,3 +127,19 @@ class PandasDataRepository:
         full_name = self.get_full_name_case(person_id, case_language)
         position = self.get_position_case(position_str, case_language)
         return rank, full_name, position
+
+
+def get_pandas_data_repository() -> PandasDataRepository:
+    pandas_data_repository = PandasDataRepository()
+    pandas_data_repository.read_all_sheets(
+        file_path=PATH_EXCEL,
+        target_sheets=[
+            Sheet.ARROWS.value,
+            Sheet.DECLENSION.value,
+            Sheet.LEAVE.value,
+            Sheet.BASE_2.value,
+            Sheet.SH.value,
+            Sheet.HV.value,
+        ]
+    )
+    return pandas_data_repository
