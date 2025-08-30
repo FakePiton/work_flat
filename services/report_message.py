@@ -126,17 +126,17 @@ class ReportMessage:
         title = f"*Присвоєні {row.iloc[18]} військові звання: {row.iloc[5]}:*\n"
 
         person_id, _ = row.iloc[56].split("_")
-        (
-            rank_dative,
-            full_name_dative,
-            position_dative
-        ) = self.pd_data_repository.get_rank_full_name_position_case(
-            person_id=int(person_id),
+
+        rank_dative = self.pd_data_repository.get_rank_case(
             rank_str=row.iloc[2],
-            position_str=row.iloc[4],
-            case_language=CaseLanguage.DATIVE,
+            case_language=CaseLanguage.ACCUSATIVE,
         )
-        self.ranks[title].append(f"- {rank_dative} {full_name_dative} {position_dative} \n")
+        full_name_dative = self.pd_data_repository.get_full_name_case(
+            person_id=int(person_id),
+            case_language=CaseLanguage.ACCUSATIVE,
+        )
+
+        self.ranks[title].append(f"- {rank_dative} {full_name_dative} {row.iloc[4]} \n")
 
     def _get_change_position(self, row):
         if not self.text_change_position:
