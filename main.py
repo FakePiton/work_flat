@@ -90,10 +90,9 @@ def main(page: ft.Page):
             )
 
             progress.visible = False
-            page.snack_bar = ft.SnackBar(
-                content=ft.Text(f"{service_name} завершено ✅"),
-                open=True
-            )
+            errors = page.pandas_data_repository.errors
+            if errors:
+                page.open(ft.SnackBar(ft.Text("\n- ".join(errors)), bgcolor=ft.Colors.RED))
             page.update()
 
         column_list_objects = [

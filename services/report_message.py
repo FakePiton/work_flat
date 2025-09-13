@@ -15,6 +15,7 @@ class ReportMessage:
         self.text_enlisted_in_a_military_unit = ""
         self.text_prescription = ""
         self.text_change_position = ""
+        self.text_transfer = ""
         self.ranks = defaultdict(list)
 
     def get_report(self, order_date: datetime | None = None):
@@ -39,6 +40,7 @@ class ReportMessage:
             self.text_enlisted_in_a_military_unit,
             self.text_prescription,
             self.text_change_position,
+            self.text_transfer,
         ]
 
         for element in elements:
@@ -68,6 +70,7 @@ class ReportMessage:
             "РОЗПОРЯДЖ": self._get_prescription,
             "ПОСАДА": self._get_change_position,
             "ЗВАННЯ": self._get_rank,
+            "ПЕРЕВ": self.get_transfer,
         }
 
         result = arrows[
@@ -93,7 +96,7 @@ class ReportMessage:
             full_name_accusative,
             position_accusative
         ) = self.pd_data_repository.get_rank_full_name_position_case(
-            person_id=int(person_id),
+            person=int(person_id),
             rank_str=row.iloc[2],
             position_str=row.iloc[5],
             case_language=CaseLanguage.ACCUSATIVE,
@@ -116,7 +119,7 @@ class ReportMessage:
             case_language=CaseLanguage.ACCUSATIVE,
         )
         full_name_accusative = self.pd_data_repository.get_full_name_case(
-            person_id=int(person_id),
+            person=int(person_id),
             case_language=CaseLanguage.ACCUSATIVE,
         )
 
@@ -132,7 +135,7 @@ class ReportMessage:
             case_language=CaseLanguage.ACCUSATIVE,
         )
         full_name_dative = self.pd_data_repository.get_full_name_case(
-            person_id=int(person_id),
+            person=int(person_id),
             case_language=CaseLanguage.ACCUSATIVE,
         )
 
@@ -149,7 +152,7 @@ class ReportMessage:
             case_language=CaseLanguage.ACCUSATIVE,
         )
         full_name_accusative = self.pd_data_repository.get_full_name_case(
-            person_id=int(person_id),
+            person=int(person_id),
             case_language=CaseLanguage.ACCUSATIVE,
         )
         position_accusative = self.pd_data_repository.get_position_case(
@@ -161,3 +164,18 @@ class ReportMessage:
             f"- {rank_accusative} {full_name_accusative} "
             f"{row.iloc[4]} призначено на посаду {position_accusative}\n"
         )
+
+    def get_transfer(self, row):
+        if not self.text_transfer:
+            self.text_transfer = "*Переведено до інших військових частин:* \n"
+
+        rank_accusative = self.pd_data_repository.get_rank_case(
+            rank_str=row.iloc[2],
+            case_language=CaseLanguage.ACCUSATIVE,
+        )
+        full_name_accusative = self.pd_data_repository.get_full_name_case(
+            person=row.iloc[3],
+            case_language=CaseLanguage.ACCUSATIVE,
+        )
+
+        self.text_transfer += f"- {rank_accusative} {full_name_accusative} {row.iloc[4]} \n"

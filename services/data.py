@@ -2,20 +2,30 @@ from datetime import datetime
 import pandas as pd
 from constants import Sheet, CaseLanguage
 from settings import PATH_EXCEL
+from typing import Any
 
 
 class PandasDataRepository:
     def __init__(self) -> None:
         self.sheets = None
+        self.errors = []
+
+    def clear_errors(self):
+        self.errors = []
 
     def read_all_sheets(self, target_sheets: list[str], file_path: str):
         self.sheets = pd.read_excel(file_path, sheet_name=target_sheets)
 
-    def get_person_by_id(self, person_id: int) -> dict | None:
+    def get_person(self, person: int | str) -> Any | None:
         base_2 = self.sheets[Sheet.BASE_2.value]
         columns_names = base_2.columns.tolist()
 
-        result = base_2[base_2[columns_names[1]] == person_id]
+        if type(person) is int:
+            result = base_2[base_2[columns_names[1]] == person]
+        elif type(person) is str:
+            result = base_2[base_2[columns_names[2]] == person]
+        else:
+            return None
 
         if not result.empty:
             return result.iloc[0]
@@ -85,6 +95,10 @@ class PandasDataRepository:
 
         result = declension_sheet[declension_sheet["Звання називний"].str.strip() == rank_str.strip()]
 
+        if result.empty:
+            self.errors.append(f"Звання не знайдено для аргумента {rank_str=}")
+            return "!!!ЗВАННЯ НЕ ЗНАЙДЕНО!!!"
+
         if case_language == CaseLanguage.ACCUSATIVE:
             return result["✪ вибери!"].iloc[0]
         elif case_language == CaseLanguage.DATIVE:
@@ -92,10 +106,14 @@ class PandasDataRepository:
 
     def get_full_name_case(
         self,
-        person_id: int,
+        person: int | str,
         case_language: CaseLanguage,
     ) -> str:
-        person = self.get_person_by_id(person_id)
+        person = self.get_person(person)
+
+        if person is None:
+            self.errors.append(f"ПІБ не знайдено для аргумента {person=}")
+            return "!!!ПІБ НЕ ЗНАЙДЕНИЙ!!!"
 
         if case_language == CaseLanguage.ACCUSATIVE:
             return person.iloc[111]
@@ -110,6 +128,10 @@ class PandasDataRepository:
         sh_sheet = self.sheets[Sheet.SH.value]
         result = sh_sheet[sh_sheet["Повна посада"].str.strip() == position_str.strip()]
 
+        if result.empty:
+            self.errors.append(f"Посада не знайдено для аргумента {position_str=}")
+            return "!!!ПОСАДА НЕ ЗНАЙДЕНА!!!"
+
         if case_language == CaseLanguage.ACCUSATIVE:
             return result["знахідний (без в/ч)"].iloc[0]
         elif case_language == CaseLanguage.DATIVE:
@@ -119,12 +141,12 @@ class PandasDataRepository:
     def get_rank_full_name_position_case(
         self,
         rank_str: str,
-        person_id: int,
+        person: int,
         position_str: str,
         case_language: CaseLanguage,
     ):
         rank = self.get_rank_case(rank_str, case_language)
-        full_name = self.get_full_name_case(person_id, case_language)
+        full_name = self.get_full_name_case(person, case_language)
         position = self.get_position_case(position_str, case_language)
         return rank, full_name, position
 

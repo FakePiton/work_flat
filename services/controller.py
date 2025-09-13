@@ -40,10 +40,11 @@ class Controller:
     def run_create_order(self, **kwargs):
         text_panel: ft.Text = kwargs.get("text_panel")
 
+        self.pandas_data_repository.clear_errors()
         new_order = NewOrder(self.pandas_data_repository)
         vacation = Vacation(self.pandas_data_repository)
         vlk = VLK(self.pandas_data_repository)
-        
+
         new_order.create_template()
         vacation.overdue_leave_check()
         vlk.report()
@@ -69,6 +70,8 @@ class Controller:
     def run_report_message(self, **kwargs):
         text_panel: ft.Text = kwargs.get("text_panel")
         date_picker_date: datetime | None = kwargs.get("date_picker_date")
+
+        self.pandas_data_repository.clear_errors()
 
         report_message = ReportMessage(
             sheets=self.pandas_data_repository.sheets,
