@@ -129,17 +129,17 @@ class ReportMessage:
         self.text_prescription += f"- {rank_accusative} {full_name_accusative} {row.iloc[4]}\n"
 
     def _get_rank(self, row):
-        title = f"*Присвоєні {row.iloc[18]} військові звання: {row.iloc[5]}:*\n"
+        title = f"*Присвоєне {row.iloc[18]} військові звання: {row.iloc[5]}:*\n"
 
         person_id, _ = row.iloc[56].split("_")
 
         rank_dative = self.pd_data_repository.get_rank_case(
             rank_str=row.iloc[2],
-            case_language=CaseLanguage.ACCUSATIVE,
+            case_language=CaseLanguage.DATIVE,
         )
         full_name_dative = self.pd_data_repository.get_full_name_case(
             person=int(person_id),
-            case_language=CaseLanguage.ACCUSATIVE,
+            case_language=CaseLanguage.DATIVE,
         )
 
         self.ranks[title].append(f"- {rank_dative} {full_name_dative} {row.iloc[4]} \n")
